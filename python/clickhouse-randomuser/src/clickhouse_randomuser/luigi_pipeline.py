@@ -26,11 +26,15 @@ class DownloadRandomUsers(luigi.Task):
 
 class SchemaedCsvRows(luigi.Task):
     workdir = luigi.PathParameter(default=".")
+    work_subdir = luigi.PathParameter(default=datetime.now(UTC).isoformat(timespec="seconds"))
 
     def requires(self):
         return DownloadRandomUsers(workdir=self.workdir)
 
     def output(self):
+        return luigi.LocalTarget(Path(self.workdir) / "schemaed-processing" / f"{self.work_subdir}.log")
+
+    """
         return {
             "valid": luigi.LocalTarget(
                 Path(self.workdir) / "schemaed"
@@ -39,8 +43,17 @@ class SchemaedCsvRows(luigi.Task):
                 Path(self.workdir) / "schemaed-failed"
             ),
         }
+    """
 
     def run(self):
-        with self.output()["valid"].temporary_path() as valid_path:
-            with self.output()["invalid"].temporary_path() as invalid_path:
-                schemaed_csv_rows_to_file(logger, Path(self.workdir) / "raw", Path(valid_path), Path(invalid_path))
+        raw_dir = Path(str(self.input())).parents[1]  # move up a dir, since there will be a timestamp subdir
+        valid_path = Path(self.workdir) / "schemaed"
+        invalid_path = Path(self.workdir) / "schemaed-failed"
+        with self.output().temporary_path() as temp_output_path:
+            schemaed_csv_rows_to_file(
+                logger,
+                Path(str(temp_output_path)),
+                raw_dir,
+                Path(valid_path),
+                Path(invalid_path)
+            )

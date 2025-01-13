@@ -37,21 +37,31 @@ def schemaed_csv_rows(logger: Logger, input_generator: Iterator[str]) -> Iterato
         yield (stream_index, line)
 
 
-def schemaed_csv_rows_to_file(logger: Logger, raw_folder: Path, valid_output_path: Path, invalid_output_path: Path):
+def schemaed_csv_rows_to_file(
+        logger: Logger,
+        processing_log_path: Path,
+        raw_folder: Path,
+        valid_output_path: Path,
+        invalid_output_path: Path
+):
     csv_filenames = raw_folder.glob("**/*csv")
-    for csv_filename in csv_filenames:
-        subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
-        (valid_output_path / subdir).mkdir(parents=True)
-        (invalid_output_path / subdir).mkdir(parents=True)
-        full_valid_path = valid_output_path / subdir / "schemaed-randomusers.csv"
-        full_invalid_path = invalid_output_path / subdir / "schemaed-failed-randomusers.csv"
-        with open(csv_filename, "rt") as in_f:
-            with open(full_valid_path, "wt") as valid_output_lines:
-                with open(full_invalid_path, "wt") as invalid_output_lines:
-                    for stream_index, record in schemaed_csv_rows(logger, in_f):
-                        if stream_index == 0:
-                            valid_output_lines.write(record)
-                        elif stream_index == 1:
-                            invalid_output_lines.write(record)
-                        else:
-                            logger.error(f"encountered unknown stream_index {stream_index}")
+    with open(processing_log_path, "wt") as processing_log_f:
+        for csv_filename in csv_filenames:
+            subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
+            (valid_output_path / subdir).mkdir(parents=True)
+            (invalid_output_path / subdir).mkdir(parents=True)
+            full_valid_path = valid_output_path / subdir / "schemaed-randomusers.csv"
+            full_invalid_path = invalid_output_path / subdir / "schemaed-failed-randomusers.csv"
+            with open(csv_filename, "rt") as in_f:
+                with open(full_valid_path, "wt") as valid_output_lines:
+                    with open(full_invalid_path, "wt") as invalid_output_lines:
+                        for stream_index, record in schemaed_csv_rows(logger, in_f):
+                            if stream_index == 0:
+                                valid_output_lines.write(record)
+                            elif stream_index == 1:
+                                invalid_output_lines.write(record)
+                            else:
+                                logger.error(f"encountered unknown stream_index {stream_index}")
+            processing_log_f.write(str(csv_filename))
+            csv_filename.unlink()  # delete processed raw file
+            csv_filename.parent.rmdir()  # delete folder containing processed raw file
