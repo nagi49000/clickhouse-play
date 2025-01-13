@@ -41,6 +41,8 @@ def schemaed_csv_rows(logger: Logger, input_generator: Iterator[str]) -> Iterato
                 for row in rows:
                     if len(row) == 34:  # check there are 34 columns in the record
                         stream_index = 0
+        if stream_index != 0:
+            logger.warning("Encountered schema-failing record")
         yield (stream_index, line)
 
 
