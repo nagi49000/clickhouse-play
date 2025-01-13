@@ -34,17 +34,6 @@ class SchemaedCsvRows(luigi.Task):
     def output(self):
         return luigi.LocalTarget(Path(self.workdir) / "schemaed-processing" / f"{self.work_subdir}.log")
 
-    """
-        return {
-            "valid": luigi.LocalTarget(
-                Path(self.workdir) / "schemaed"
-            ),
-            "invalid": luigi.LocalTarget(
-                Path(self.workdir) / "schemaed-failed"
-            ),
-        }
-    """
-
     def run(self):
         raw_dir = Path(str(self.input())).parents[1]  # move up a dir, since there will be a timestamp subdir
         valid_path = Path(self.workdir) / "schemaed"
