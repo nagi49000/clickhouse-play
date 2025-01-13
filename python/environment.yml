@@ -1,0 +1,7 @@
+name: clickhouse-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip=24.3.1
+  - python=3.12.8
