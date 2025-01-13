@@ -29,3 +29,29 @@ def download_random_users_to_file(logger: Logger, output_path: Path, n_record: i
     with open(output_path, "wt") as f:
         for line in download_random_users(logger, n_record):
             f.write(line)
+
+
+def schemaed_csv_rows(logger: Logger, input_generator: Iterator[str]) -> Iterator[tuple[int, str]]:
+    for line in input_generator:
+        stream_index = 0  # TODO some proper schema checking
+        yield (stream_index, line)
+
+
+def schemaed_csv_rows_to_file(logger: Logger, raw_folder: Path, valid_output_path: Path, invalid_output_path: Path):
+    csv_filenames = raw_folder.glob("**/*csv")
+    for csv_filename in csv_filenames:
+        subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
+        (valid_output_path / subdir).mkdir(parents=True)
+        (invalid_output_path / subdir).mkdir(parents=True)
+        full_valid_path = valid_output_path / subdir / "schemaed-randomusers.csv"
+        full_invalid_path = invalid_output_path / subdir / "schemaed-failed-randomusers.csv"
+        with open(csv_filename, "rt") as in_f:
+            with open(full_valid_path, "wt") as valid_output_lines:
+                with open(full_invalid_path, "wt") as invalid_output_lines:
+                    for stream_index, record in schemaed_csv_rows(logger, in_f):
+                        if stream_index == 0:
+                            valid_output_lines.write(record)
+                        elif stream_index == 1:
+                            invalid_output_lines.write(record)
+                        else:
+                            logger.error(f"encountered unknown stream_index {stream_index}")
