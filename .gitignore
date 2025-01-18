@@ -172,3 +172,5 @@ cython_debug/
 
 # custom ignores
 python/clickhouse-randomuser/src/luigi-output/
+ch_data/
+ch_logs/

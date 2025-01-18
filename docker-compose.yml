@@ -4,4 +4,19 @@ services:
     build:
       context: .
       dockerfile: services/luigi-randomusers/Dockerfile
+    environment:
+      - N_RECORD=100
+      - SLEEP_SECS=300
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    volumes:
+      - ./ch_data:/var/lib/clickhouse/
+      - ./ch_logs:/var/log/clickhouse-server/
+    ports:
+      - '127.0.0.1:8123:8123'
+      - '127.0.0.1:9000:9000'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 ...
