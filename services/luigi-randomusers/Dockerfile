@@ -1,7 +1,10 @@
 FROM python:3.12
 ARG norootuser=default
 
-RUN pip install luigi requests &&\
+RUN pip install \
+    luigi==3.6.0 \
+    requests==2.32.3 \
+    clickhouse-connect==0.8.14 &&\
     useradd -ms /bin/bash ${norootuser}
 USER default
 

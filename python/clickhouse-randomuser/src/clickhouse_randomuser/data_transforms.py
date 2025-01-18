@@ -3,6 +3,11 @@ import csv
 from logging import Logger
 from typing import Iterator
 from pathlib import Path
+from clickhouse_connect import get_client
+from .clickhouse_queries import (
+    get_create_database_query,
+    get_create_table_query,
+)
 
 
 def download_random_users(
@@ -47,11 +52,11 @@ def schemaed_csv_rows(logger: Logger, input_generator: Iterator[str]) -> Iterato
 
 
 def schemaed_csv_rows_to_file(
-        logger: Logger,
-        processing_log_path: Path,
-        raw_folder: Path,
-        valid_output_path: Path,
-        invalid_output_path: Path
+    logger: Logger,
+    processing_log_path: Path,
+    raw_folder: Path,
+    valid_output_path: Path,
+    invalid_output_path: Path
 ):
     csv_filenames = raw_folder.glob("**/*csv")
     with open(processing_log_path, "wt") as processing_log_f:
@@ -82,3 +87,23 @@ def schemaed_csv_rows_to_file(
             processing_log_f.write(f"{csv_filename},{len(valid_records)},{len(invalid_records)}\n")
             csv_filename.unlink()  # delete processed raw file
             csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
+
+
+def valid_rows_to_clickhouse(
+    logger: Logger,
+    processing_log_path: Path,
+    valid_rows_path: Path,
+    clickhouse_host: str,
+    clickhouse_database: str,
+    clickhouse_table: str,
+    clickhouse_username: str | None = None,
+    clickhouse_password: str = ""
+):
+    with open(processing_log_path, "wt") as processing_log_f:
+        client = get_client(
+            host=clickhouse_host,
+            username=clickhouse_username,
+            password=clickhouse_password,
+        )
+        client.command(get_create_database_query(clickhouse_database, "Simple Database for random users"))
+        client.command(get_create_table_query(clickhouse_database, clickhouse_table, "Fat table for random users"))

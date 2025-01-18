@@ -6,8 +6,13 @@ services:
       dockerfile: services/luigi-randomusers/Dockerfile
     environment:
       - N_RECORD=100
-      - SLEEP_SECS=300
-  clickhouse:
+      - SLEEP_SECS=30
+    networks:
+      - ch_net
+    depends_on:
+      - clickhouse-server
+
+  clickhouse-server:
     image: clickhouse/clickhouse-server:24.8-alpine
     volumes:
       - ./ch_data:/var/lib/clickhouse/
@@ -19,4 +24,15 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+    networks:
+      - ch_net
+
+networks:
+  ch_net:
 ...

@@ -5,6 +5,7 @@ from pathlib import Path
 from .data_transforms import (
     download_random_users_to_file,
     schemaed_csv_rows_to_file,
+    valid_rows_to_clickhouse,
 )
 
 logger = logging.getLogger("luigi")
@@ -45,4 +46,28 @@ class SchemaedCsvRows(luigi.Task):
                 raw_dir,
                 Path(valid_path),
                 Path(invalid_path)
+            )
+
+
+class ToClickhouse(luigi.Task):
+    workdir = luigi.PathParameter(default=".")
+    work_subdir = luigi.PathParameter(default=datetime.now(UTC).isoformat(timespec="seconds"))
+
+    def requires(self):
+        return SchemaedCsvRows(workdir=self.workdir)
+
+    def output(self):
+        return luigi.LocalTarget(Path(self.workdir) / "clickhouse-processing" / f"{self.work_subdir}.log")
+
+    def run(self):
+        valid_path = Path(self.workdir) / "schemaed"
+        with self.output().temporary_path() as temp_output_path:
+            valid_rows_to_clickhouse(
+                logger,
+                Path(str(temp_output_path)),
+                Path(valid_path),
+                "clickhouse-server",
+                "db_random_user",
+                "user",
+                clickhouse_username="default",
             )

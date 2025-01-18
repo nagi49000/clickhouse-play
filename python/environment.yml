@@ -9,3 +9,4 @@ dependencies:
       - requests==2.32.3
       - black==24.10.0
       - luigi==3.6.0
+      - clickhouse_connect==0.8.14

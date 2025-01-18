@@ -14,6 +14,6 @@ LUIGI_WORKDIR=${LUIGI_WORKDIR:-luigi-output}
 # loop away
 while true
 do
-  python -m luigi --module clickhouse_randomuser.luigi_pipeline  SchemaedCsvRows --workdir ${LUIGI_WORKDIR} --local-scheduler --DownloadRandomUsers-n-record ${N_RECORD}
+  python -m luigi --module clickhouse_randomuser.luigi_pipeline ToClickhouse --workdir ${LUIGI_WORKDIR} --local-scheduler --DownloadRandomUsers-n-record ${N_RECORD}
   sleep ${SLEEP_SECS}
 done
