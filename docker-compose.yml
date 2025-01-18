@@ -1,0 +1,7 @@
+---
+services:
+  luigi-randomusers:
+    build:
+      context: .
+      dockerfile: services/luigi-randomusers/Dockerfile
+...
