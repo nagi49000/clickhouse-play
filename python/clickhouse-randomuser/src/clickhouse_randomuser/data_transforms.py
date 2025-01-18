@@ -55,6 +55,7 @@ def schemaed_csv_rows_to_file(
 ):
     csv_filenames = raw_folder.glob("**/*csv")
     with open(processing_log_path, "wt") as processing_log_f:
+        processing_log_f.write("landing_filename,number_valid_records,number_invalid_records\n")
         for csv_filename in csv_filenames:
             subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
             valid_records = []
@@ -78,6 +79,6 @@ def schemaed_csv_rows_to_file(
             with open(full_invalid_path, "wt") as invalid_output_lines:
                 invalid_output_lines.writelines(invalid_records)
 
-            processing_log_f.write(str(csv_filename))
+            processing_log_f.write(f"{csv_filename},{len(valid_records)},{len(invalid_records)}\n")
             csv_filename.unlink()  # delete processed raw file
             csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
