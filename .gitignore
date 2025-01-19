@@ -174,3 +174,4 @@ cython_debug/
 python/clickhouse-randomuser/src/luigi-output/
 ch_data/
 ch_logs/
+luigi-output/

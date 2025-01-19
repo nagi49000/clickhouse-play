@@ -5,7 +5,7 @@ RUN pip install \
     luigi==3.6.0 \
     requests==2.32.3 \
     clickhouse-connect==0.8.14 &&\
-    useradd -ms /bin/bash ${norootuser}
+    useradd -m -s /bin/bash -u 1001 ${norootuser}
 USER default
 
 WORKDIR /home/${norootuser}

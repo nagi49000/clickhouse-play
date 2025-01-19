@@ -5,8 +5,10 @@ services:
       context: .
       dockerfile: services/luigi-randomusers/Dockerfile
     environment:
-      - N_RECORD=100
-      - SLEEP_SECS=30
+      - N_RECORD=5
+      - SLEEP_SECS=3000
+    volumes:
+      - ./luigi-output:/home/default/clickhouse-randomuser/src/luigi-output
     networks:
       - ch_net
     depends_on:
