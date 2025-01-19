@@ -93,6 +93,7 @@ def valid_rows_to_clickhouse(
     logger: Logger,
     processing_log_path: Path,
     valid_rows_path: Path,
+    to_clickhouse_fail_path: Path,
     clickhouse_host: str,
     clickhouse_database: str,
     clickhouse_table: str,

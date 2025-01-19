@@ -8,41 +8,43 @@ def get_create_table_query(database_name: str, table_name: str, table_comment: s
     return f"""
     CREATE TABLE IF NOT EXISTS {database_name}.{table_name}
     (
-        gender String
-        name.title String
-        name.first String
-        name.last String
-        location.street.number UInt32
-        location.street.name String
-        location.city String
-        location.state String
-        location.country String
-        location.postcode String
-        location.coordinates.latitude Float64
-        location.coordinates.longitude Float64
-        location.timezone.offset String
-        location.timezone.description String
-        email String
-        login.uuid String
-        login.username String
-        login.password String
-        login.salt String
-        login.md5 String
-        login.sha1 String
-        login.sha256 String
-        dob.date DateTime
-        dob.age UInt16
-        registered.date DateTime
-        registered.age UInt16
-        phone String
-        cell String
-        id.name String
-        id.value String
-        picture.large String
-        picture.medium String
-        picture.thumbnail String
+        uuid UUID,
+        gender String,
+        name_title String,
+        name_first String,
+        name_last String,
+        location_street_number UInt32,
+        location_street_name String,
+        location_city String,
+        location_state String,
+        location_country String,
+        location_postcode String,
+        location_coordinates_latitude Float64,
+        location_coordinates_longitude Float64,
+        location_timezone_offset String,
+        location_timezone_description String,
+        email String,
+        login_uuid String,
+        login_username String,
+        login_password String,
+        login_salt String,
+        login_md5 String,
+        login_sha1 String,
+        login_sha256 String,
+        dob_date DateTime,
+        dob_age UInt16,
+        registered_date DateTime,
+        registered_age UInt16,
+        phone String,
+        cell String,
+        id_name String,
+        id_value String,
+        picture_large String,
+        picture_medium String,
+        picture_thumbnail String,
         nat String
     )
     ENGINE = MergeTree
-    COMMENT '{table_comment}'
+    ORDER BY uuid
+    COMMENT '{table_comment}';
     """

@@ -44,8 +44,8 @@ class SchemaedCsvRows(luigi.Task):
                 logger,
                 Path(str(temp_output_path)),
                 raw_dir,
-                Path(valid_path),
-                Path(invalid_path)
+                valid_path,
+                invalid_path
             )
 
 
@@ -61,11 +61,13 @@ class ToClickhouse(luigi.Task):
 
     def run(self):
         valid_path = Path(self.workdir) / "schemaed"
+        clickhouse_fail_path = Path(self.workdir) / "to-clickhouse-failed"
         with self.output().temporary_path() as temp_output_path:
             valid_rows_to_clickhouse(
                 logger,
                 Path(str(temp_output_path)),
-                Path(valid_path),
+                valid_path,
+                clickhouse_fail_path,
                 "clickhouse-server",
                 "db_random_user",
                 "user",
