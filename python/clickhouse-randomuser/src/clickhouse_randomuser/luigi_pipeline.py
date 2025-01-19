@@ -8,7 +8,7 @@ from .data_transforms import (
     valid_rows_to_clickhouse,
 )
 
-logger = logging.getLogger("luigi")
+logger = logging.getLogger("luigi-interface")
 
 
 class DownloadRandomUsers(luigi.Task):

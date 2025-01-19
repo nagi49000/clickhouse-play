@@ -58,13 +58,15 @@ def get_create_table_query(database_name: str, table_name: str, table_comment: s
 def get_insert_into_query(
     database_name: str,
     table_name: str,
-    values: Iterable[tuple],
+    values_iterable: Iterable[tuple],
     columns: tuple[str] | None = None
 ) -> (int, str):
     columns_as_str = "(*)" if columns is None else str(tuple(columns)).replace("'", "")
     # replace to remove quotes around column names
     query_pt_1 = f"INSERT INTO {database_name}.{table_name} {columns_as_str} VALUES"
-    values_as_insert_strs = [str(("generateUUIDv4()", *x)) for x in values]
+    # convert each row into a string ready for query insertion; pre-prend UUID and nasty crow-bar clean on '
+    values_as_insert_strs = [str(("generateUUIDv4()", *[x.replace("'", " ") for x in values]))
+                             for values in values_iterable]
     query_pt_2 = ", ".join(values_as_insert_strs)
     # replace to remove quotes around clickhouse function
     query = f"{query_pt_1} {query_pt_2} ;".replace("'generateUUIDv4()'", "generateUUIDv4()")

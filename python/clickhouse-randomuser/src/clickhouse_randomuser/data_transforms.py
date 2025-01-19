@@ -62,32 +62,38 @@ def schemaed_csv_rows_to_file(
     csv_filenames = raw_folder.glob("**/*csv")
     with open(processing_log_path, "wt") as processing_log_f:
         processing_log_f.write("landing_filename,number_valid_records,number_invalid_records\n")
+        n_processed_file = 0
         for csv_filename in csv_filenames:
-            subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
-            valid_records = []
-            invalid_records = []
-            with open(csv_filename, "rt") as in_f:
-                for stream_index, record in schemaed_csv_rows(logger, in_f):
-                    if stream_index == 0:
-                        valid_records.append(record)
-                    elif stream_index == 1:
-                        invalid_records.append(record)
-                    else:
-                        logger.error(f"encountered unknown stream_index {stream_index}")
+            try:
+                subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "raw"
+                valid_records = []
+                invalid_records = []
+                with open(csv_filename, "rt") as in_f:
+                    for stream_index, record in schemaed_csv_rows(logger, in_f):
+                        if stream_index == 0:
+                            valid_records.append(record)
+                        elif stream_index == 1:
+                            invalid_records.append(record)
+                        else:
+                            logger.error(f"encountered unknown stream_index {stream_index}")
 
-            (valid_output_path / subdir).mkdir(parents=True)
-            full_valid_path = valid_output_path / subdir / "schemaed-randomusers.csv"
-            with open(full_valid_path, "wt") as valid_output_lines:
-                valid_output_lines.writelines(valid_records)
+                (valid_output_path / subdir).mkdir(parents=True)
+                full_valid_path = valid_output_path / subdir / "schemaed-randomusers.csv"
+                with open(full_valid_path, "wt") as valid_output_lines:
+                    valid_output_lines.writelines(valid_records)
 
-            (invalid_output_path / subdir).mkdir(parents=True)
-            full_invalid_path = invalid_output_path / subdir / "schemaed-failed-randomusers.csv"
-            with open(full_invalid_path, "wt") as invalid_output_lines:
-                invalid_output_lines.writelines(invalid_records)
+                (invalid_output_path / subdir).mkdir(parents=True)
+                full_invalid_path = invalid_output_path / subdir / "schemaed-failed-randomusers.csv"
+                with open(full_invalid_path, "wt") as invalid_output_lines:
+                    invalid_output_lines.writelines(invalid_records)
 
-            processing_log_f.write(f"{csv_filename},{len(valid_records)},{len(invalid_records)}\n")
-            csv_filename.unlink()  # delete processed raw file
-            csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
+                processing_log_f.write(f"{csv_filename},{len(valid_records)},{len(invalid_records)}\n")
+                csv_filename.unlink()  # delete processed raw file
+                csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
+                n_processed_file += 1
+            except Exception as exc:
+                logger.error(f"schemaed_csv_rows_to_file: on file {csv_filename} encountered {exc}")
+        logger.debug(f"schemaed_csv_rows_to_file: processed {n_processed_file} files")
 
 
 def valid_rows_to_clickhouse(
@@ -149,17 +155,23 @@ def valid_rows_to_clickhouse(
     csv_filenames = valid_rows_path.glob("**/*csv")
     with open(processing_log_path, "wt") as processing_log_f:
         processing_log_f.write("schemaed_filename,n_rows_to_clickhouse\n")
+        n_processed_file = 0
         for csv_filename in csv_filenames:
-            subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "schemaed"
-            with open(csv_filename, "rt") as file_obj:
-                reader = csv.reader(file_obj)
-                n_rows, insert_into_query = get_insert_into_query(
-                    clickhouse_database, clickhouse_table, reader, columns=columns
-                )
-                # print(insert_into_query)
-                query_summary = client.command(insert_into_query)
-                # TODO some qualify query_summary, e.g. query_summary.written_rows
+            try:
+                subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "schemaed"
+                with open(csv_filename, "rt") as file_obj:
+                    reader = csv.reader(file_obj)
+                    n_rows, insert_into_query = get_insert_into_query(
+                        clickhouse_database, clickhouse_table, reader, columns=columns
+                    )
+                    # print(insert_into_query)
+                    query_summary = client.command(insert_into_query)
+                    # TODO some qualify query_summary, e.g. query_summary.written_rows
 
-            processing_log_f.write(f"{csv_filename},{n_rows}\n")
-            csv_filename.unlink()  # delete processed schemaed file
-            csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
+                processing_log_f.write(f"{csv_filename},{n_rows}\n")
+                csv_filename.unlink()  # delete processed schemaed file
+                csv_filename.parent.rmdir()  # delete folder containing now-removed raw file
+                n_processed_file += 1
+            except Exception as exc:
+                logger.error(f"valid_rows_to_clickhouse: on file {csv_filename} encountered {exc}")
+        logger.debug(f"valid_rows_to_clickhouse: processed {n_processed_file} files")
