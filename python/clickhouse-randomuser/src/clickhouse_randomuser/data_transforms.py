@@ -8,6 +8,7 @@ from .clickhouse_queries import (
     get_create_database_query,
     get_create_table_query,
     get_insert_into_query,
+    table_schema,
 )
 
 
@@ -107,51 +108,23 @@ def valid_rows_to_clickhouse(
     clickhouse_username: str | None = None,
     clickhouse_password: str = ""
 ):
-    # TODO pull this from schema
-    columns = (
-        "uuid",
-        "gender",
-        "name_title",
-        "name_first",
-        "name_last",
-        "location_street_number",
-        "location_street_name",
-        "location_city",
-        "location_state",
-        "location_country",
-        "location_postcode",
-        "location_coordinates_latitude",
-        "location_coordinates_longitude",
-        "location_timezone_offset",
-        "location_timezone_description",
-        "email",
-        "login_uuid",
-        "login_username",
-        "login_password",
-        "login_salt",
-        "login_md5",
-        "login_sha1",
-        "login_sha256",
-        "dob_date",
-        "dob_age",
-        "registered_date",
-        "registered_age",
-        "phone",
-        "cell",
-        "id_name",
-        "id_value",
-        "picture_large",
-        "picture_medium",
-        "picture_thumbnail",
-        "nat",
-    )
+    columns = tuple([x[0] for x in table_schema][:-1])  # drop off last entry since that is auto-populated
+
     client = get_client(
         host=clickhouse_host,
         username=clickhouse_username,
         password=clickhouse_password,
     )
-    client.command(get_create_database_query(clickhouse_database, "Simple Database for random users"))
-    client.command(get_create_table_query(clickhouse_database, clickhouse_table, "Fat table for random users"))
+    client.command(
+        get_create_database_query(
+            clickhouse_database, "Simple Database for random users"
+        )
+    )
+    client.command(
+        get_create_table_query(
+            clickhouse_database, clickhouse_table, "Fat table for random users", table_schema, "uuid"
+        )
+    )
     csv_filenames = valid_rows_path.glob("**/*csv")
     with open(processing_log_path, "wt") as processing_log_f:
         processing_log_f.write("schemaed_filename,n_rows_to_clickhouse\n")
