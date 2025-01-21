@@ -108,7 +108,9 @@ def valid_rows_to_clickhouse(
     clickhouse_username: str | None = None,
     clickhouse_password: str = ""
 ):
-    columns = tuple([x[0] for x in table_schema][:-1])  # drop off last entry since that is auto-populated
+    # drop off columns which have DEFAULT values, and record only column names;
+    # these are the columns we need to populate as rows
+    columns = tuple([x[0] for x in table_schema if "DEFAULT" not in x[2]])
 
     client = get_client(
         host=clickhouse_host,
@@ -133,6 +135,7 @@ def valid_rows_to_clickhouse(
             try:
                 subdir = str(csv_filename.parent).split("/")[-1]  # extract the subdirectory under "schemaed"
                 with open(csv_filename, "rt") as file_obj:
+                    # iterator over rows of data; data should be in the same order as columns
                     reader = csv.reader(file_obj)
                     n_rows, insert_into_query = get_insert_into_query(
                         clickhouse_database, clickhouse_table, reader, columns=columns

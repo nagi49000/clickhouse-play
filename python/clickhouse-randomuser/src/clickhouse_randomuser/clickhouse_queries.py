@@ -4,7 +4,7 @@ from typing import Iterable
 # each column defined by a 3-tuple of (<column name>, <type>, <other clickhouse commands>)
 # so that when the 3-tuple is concatenated (with spaces) the line is a valid line in a CREATE TABLE query
 table_schema = [
-    ("uuid", "UUID", ""),
+    ("uuid", "UUID", "DEFAULT generateUUIDv4()"),
     ("gender", "String", ""),
     ("name_title", "String", ""),
     ("name_first", "String", ""),
@@ -59,6 +59,8 @@ def get_create_table_query(
     table_schema: list[tuple[str, str, str]],
     order_by_column: str
 ) -> str:
+    # concat each tuple in the schema with spaces, add a comma,
+    # and then make one big string with newlines between each row
     create_table_columns = "\n".join([" ".join(x) + "," for x in table_schema])
 
     return f"""
@@ -79,12 +81,12 @@ def get_insert_into_query(
     columns: tuple[str] | None = None
 ) -> (int, str):
     # TODO make query async
-    columns_as_str = "(*)" if columns is None else str(tuple(columns)).replace("'", "")
     # replace to remove quotes around column names
+    columns_as_str = "(*)" if columns is None else str(tuple(columns)).replace("'", "")
     query_pt_1 = f"INSERT INTO {database_name}.{table_name} {columns_as_str} VALUES"
     # convert each row into a string ready for query insertion; pre-prend UUID and nasty crow-bar clean on '
     # replace to remove quotes around clickhouse function
-    values_as_insert_strs = [str(("generateUUIDv4()", *[x.replace("'", " ") for x in values])).replace("'generateUUIDv4()'", "generateUUIDv4()")
+    values_as_insert_strs = [str(tuple([x.replace("'", " ") for x in values]))
                              for values in values_iterable]
     query_pt_2 = ", ".join(values_as_insert_strs)
     query = f"{query_pt_1} {query_pt_2} ;"
