@@ -142,9 +142,8 @@ def valid_rows_to_clickhouse(
                     )
                     # print(insert_into_query)
                     query_summary = client.command(insert_into_query)
-                    # TODO some qualify query_summary, e.g. query_summary.written_rows
                     logger.debug((
-                        f"valid_rows_to_clickhouse: inserted {n_rows} rows "
+                        f"valid_rows_to_clickhouse: uploaded {n_rows} rows "
                         f"into {clickhouse_database}.{clickhouse_table} "
                         f"with query_id {query_summary.query_id()} in {query_summary.summary['elapsed_ns']} ns"
                     ))

@@ -20,8 +20,8 @@ services:
       - ./ch_data:/var/lib/clickhouse/
       - ./ch_logs:/var/log/clickhouse-server/
     ports:
-      - '127.0.0.1:8123:8123'
-      - '127.0.0.1:9000:9000'
+      - '8123:8123'
+      - '9000:9000'
     ulimits:
       nofile:
         soft: 262144
