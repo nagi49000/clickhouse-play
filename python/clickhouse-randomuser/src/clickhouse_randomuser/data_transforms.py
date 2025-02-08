@@ -19,9 +19,9 @@ def download_random_users(
     response = requests.get(url, params={"format": "csv", "results": n_record})
     if response.ok:
         response_list = response.text.split("\n")
-        if len(response_list) != n_record + 1:
+        if len(response_list) != n_record + 1:  # extra 1 due to column headers
             logger.error(
-                f"GET to {url} has retrieved {len(response_list)} rows; expected {n_record + 1}"
+                f"GET to {url} has retrieved {len(response_list) - 1} rows; expected {n_record}"
             )
         if response.text.startswith("gender,name.title") and not include_header:
             response_list = response_list[1:]  # drop the 1st row, which is header
@@ -143,6 +143,11 @@ def valid_rows_to_clickhouse(
                     # print(insert_into_query)
                     query_summary = client.command(insert_into_query)
                     # TODO some qualify query_summary, e.g. query_summary.written_rows
+                    logger.debug((
+                        f"valid_rows_to_clickhouse: inserted {n_rows} rows "
+                        f"into {clickhouse_database}.{clickhouse_table} "
+                        f"with query_id {query_summary.query_id()} in {query_summary.summary['elapsed_ns']} ns"
+                    ))
 
                 processing_log_f.write(f"{csv_filename},{n_rows}\n")
                 csv_filename.unlink()  # delete processed schemaed file

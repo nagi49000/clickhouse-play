@@ -80,10 +80,10 @@ def get_insert_into_query(
     values_iterable: Iterable[tuple],
     columns: tuple[str] | None = None
 ) -> (int, str):
-    # TODO make query async
     # replace to remove quotes around column names
     columns_as_str = "(*)" if columns is None else str(tuple(columns)).replace("'", "")
-    query_pt_1 = f"INSERT INTO {database_name}.{table_name} {columns_as_str} VALUES"
+    clickhouse_async_settings = "SETTINGS async_insert=1, wait_for_async_insert=0"
+    query_pt_1 = f"INSERT INTO {database_name}.{table_name} {columns_as_str} {clickhouse_async_settings} VALUES"
     # convert each row into a string ready for query insertion; pre-prend UUID and nasty crow-bar clean on '
     # replace to remove quotes around clickhouse function
     values_as_insert_strs = [str(tuple([x.replace("'", " ") for x in values]))
