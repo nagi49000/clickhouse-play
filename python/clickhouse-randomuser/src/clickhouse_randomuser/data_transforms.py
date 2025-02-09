@@ -141,6 +141,7 @@ def valid_rows_to_clickhouse(
                         clickhouse_database, clickhouse_table, reader, columns=columns
                     )
                     # print(insert_into_query)
+                    # query_summary.summary includes a bunch of numbers and metadata that could be sent to logging and/or monitoring
                     query_summary = client.command(insert_into_query)
                     logger.debug((
                         f"valid_rows_to_clickhouse: uploaded {n_rows} rows "
