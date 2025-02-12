@@ -19,9 +19,9 @@ services:
     volumes:
       - ./ch_data:/var/lib/clickhouse/
       - ./ch_logs:/var/log/clickhouse-server/
-    ports:
-      - '8123:8123'
-      - '9000:9000'
+    expose:
+      - 8123
+      - 9000
     ulimits:
       nofile:
         soft: 262144
