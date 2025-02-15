@@ -24,12 +24,8 @@ docker exec superset_worker pip install clickhouse-connect
 docker exec superset_worker_beat pip install clickhouse-connect
 ```
 
-On the app UI at `http://localhost:8088`, one should be able to go to (on the top right) 'Settings'>'Database Connections' to see a list of database connections, and then add a connection to clickhouse by clickig on '+ DATABASE', and clicking on the dropdown for 'supported databases', and click 'Clickhouse Connect (Superset)'. This indicates that the above pip installs have worked. To create the database connection, configure the host (ip address of your dev box, since clickhouse should be published on the host), the port to `8123`, and the database name to `db_random_user`.
+On the app UI at `http://localhost:8088`, one should be able to go to (on the top right) 'Settings'>'Database Connections' to see a list of database connections, and then add a connection to clickhouse by clicking on '+ DATABASE', and clicking on the dropdown for 'supported databases', and click 'Clickhouse Connect (Superset)'. This indicates that the above pip installs have worked. To create the database connection, configure the host (ip address of your dev box, since clickhouse should be published on the host), the port to `8123`, and the database name to `db_random_user`.
 
 One can then click on 'Datasets' in the top bar, and '+ DATASET' on the top right to add a dataset from the clickhouse database (database will be the clickhouse database, schema will be `db_random_user` and table will be `user`).
 
 To add a chart for a dashboard, one can go to 'Charts' from the top ribbon, and click on '+ CHART'. For this data, one can make a world map chart, by choosing 'Map'>'World Map' in the 'Create a new chart' window. To get a count per country, one can add 'location_country' to the 'COUNTRY COLUMN' and specify the corresponding field type to be 'Full Name', and add a metric of 'COUNT(*)'.
-
-### Other notes
-
-The data source connector is SQLAlchemy; therefore superset can connect to anything, and only to data sources supplying a connection for SQLAlchemy. In practice, this means any data source that provides an SQL connector, and only sources that provide SQL connectors.
