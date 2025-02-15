@@ -24,7 +24,7 @@ docker exec superset_worker pip install clickhouse-connect
 docker exec superset_worker_beat pip install clickhouse-connect
 ```
 
-On the app UI at `http://localhost:8088`, one should be able to go to (on the top right) 'Settings'>'Database Connections' to see a list of database connections, and then add a connection to clickhouse by clicking on '+ DATABASE', and clicking on the dropdown for 'supported databases', and click 'Clickhouse Connect (Superset)'. This indicates that the above pip installs have worked. To create the database connection, configure the host (ip address of your dev box, since clickhouse should be published on the host), the port to `8123`, and the database name to `db_random_user`.
+On the app UI at `http://localhost:8088`, one should be able to go to (on the top right) 'Settings'>'Database Connections' to see a list of database connections, and then add a connection to clickhouse by clicking on '+ DATABASE', and clicking on the dropdown for 'supported databases', and click 'Clickhouse Connect (Superset)'. This indicates that the above pip installs have worked. To create the database connection, configure the host (ip address of your dev box, since [associated clickhouse service](../../docker-compose.yml) should be published on the host), the port to `8123`, and the database name to `db_random_user`.
 
 One can then click on 'Datasets' in the top bar, and '+ DATASET' on the top right to add a dataset from the clickhouse database (database will be the clickhouse database, schema will be `db_random_user` and table will be `user`).
 
