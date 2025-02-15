@@ -12,3 +12,5 @@ With the services up and running, data should be flowing into clickhouse. One ca
 ```
 docker exec clickhouse-play-clickhouse-server-1 clickhouse-client --host localhost "SELECT COUNT(*) FROM db_random_user.user"
 ```
+
+With clickhouse running, and with data in the database, one can explore the data using [superset](services/superset/README.md).
