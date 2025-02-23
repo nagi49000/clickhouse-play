@@ -24,6 +24,13 @@ docker exec superset_worker pip install clickhouse-connect
 docker exec superset_worker_beat pip install clickhouse-connect
 ```
 
+If the above pip installs need gcc, then for each of the above containers, run
+```
+docker exec <container name> apt upgrade
+docker exec <container name> apt install -y gcc
+```
+and then re-run the pip installs.
+
 An example for using the UI to connect to clickhouse and make charts is available on the [clickhouse docs](https://clickhouse.com/docs/en/integrations/superset).
 
 On the app UI at `http://localhost:8088`, one should be able to go to (on the top right) 'Settings'>'Database Connections' to see a list of database connections, and then add a connection to clickhouse by clicking on '+ DATABASE', and clicking on the dropdown for 'supported databases', and click 'Clickhouse Connect (Superset)'. This indicates that the above pip installs have worked. To create the database connection, configure the host (ip address of your dev box, since [associated clickhouse service](../../docker-compose.yml) should be published on the host), the port to `8123`, and the database name to `db_random_user`.
