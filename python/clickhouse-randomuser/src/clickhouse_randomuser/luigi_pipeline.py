@@ -71,5 +71,6 @@ class ToClickhouse(luigi.Task):
                 "clickhouse-server",
                 "db_random_user",
                 "user",
-                clickhouse_username="default",
+                clickhouse_username="clicker",
+                clickhouse_password="clicker",
             )

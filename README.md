@@ -1,6 +1,8 @@
 # clickhouse-play
 A play area for using clickhouse as a data warehouse.
 
+Note that for testing purposes the username and password has been hardcoded. Do not do this in prod!
+
 ### Running
 
 Services can be brought up from the root of the repo directory with
